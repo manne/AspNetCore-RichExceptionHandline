@@ -11,11 +11,6 @@ namespace Application
         [HttpGet("{name}")]
         public IEnumerable<string> Get(TrivialOptions options)
         {
-            if (options.PageNumber == 21)
-            {
-                throw new InvalidOperationException("oops");
-            }
-
             return new string[] { "nothing special", options.Name, options.PageNumber.ToString() };
         }
     }
