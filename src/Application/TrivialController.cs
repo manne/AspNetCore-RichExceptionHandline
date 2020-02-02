@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,15 +10,21 @@ namespace Application
         [HttpGet("{name}")]
         public IEnumerable<string> Get(TrivialOptions options)
         {
-            return new string[] { "nothing special", options.Name, options.PageNumber.ToString() };
+            return new [] { "nothing special", options.Name, options.PageNumber?.ToString() ?? "not set" };
         }
     }
 
     public sealed class TrivialOptions
     {
-        public string Name { get; set; }
+        public TrivialOptions(string name, int? pageNumber)
+        {
+            Name = name;
+            PageNumber = pageNumber;
+        }
 
-        public int PageNumber { get; set; }
+        public string Name { get; }
+
+        public int? PageNumber { get; }
     }
 
     public class TrivialOptionsValidator : AbstractValidator<TrivialOptions>
@@ -30,7 +35,7 @@ namespace Application
                 .NotEmpty();
             RuleFor(x => x.PageNumber)
                 .InclusiveBetween(0, 21)
-                .WithMessage("Please specify a first name");
+                .WithMessage("'{PropertyName}' must be a value in the range of {From} to {To} inclusive. You used {PropertyValue}");
         }
     }
 }

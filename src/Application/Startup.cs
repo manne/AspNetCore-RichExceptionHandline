@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Obviously.Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Application
 {
@@ -25,7 +21,8 @@ namespace Application
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddMvcCore(options =>
+                .AddControllers(options => { options.ModelBinderProviders.Insert(0, new ImmutableModelProvider()); });
+            services.AddMvcCore(options =>
                 {
                     options.EnableEndpointRouting = false;
                     options.Filters.Add<ValidatorActionFilter>();
