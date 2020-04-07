@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Application
 {
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class TrivialController
     {
         [HttpGet("{name}")]
