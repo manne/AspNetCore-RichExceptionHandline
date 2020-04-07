@@ -21,10 +21,10 @@ namespace Application
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddControllers(options => { options.ModelBinderProviders.Insert(0, new ImmutableModelProvider()); });
-            services.AddMvcCore(options =>
+                .AddControllers(options =>
                 {
-                    options.EnableEndpointRouting = false;
+                    //options.EnableEndpointRouting = false;
+                    options.ModelBinderProviders.Insert(0, new ImmutableModelProvider());
                     options.Filters.Add<ValidatorActionFilter>();
                 })
                 .AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<TrivialOptionsValidator>());
@@ -50,9 +50,8 @@ namespace Application
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllers();
             });
-
-            app.UseMvc();
         }
     }
 }
