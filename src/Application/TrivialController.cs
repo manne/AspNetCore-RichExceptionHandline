@@ -6,6 +6,7 @@ namespace Application
 {
     [Route("api/[controller]")]
     [Produces("application/json")]
+    [ApiController]
     public class TrivialController
     {
         [HttpGet("{name}")]
