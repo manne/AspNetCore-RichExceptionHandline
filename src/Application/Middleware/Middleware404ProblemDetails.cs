@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Middleware
 {
@@ -12,10 +11,14 @@ namespace Application.Middleware
     {
         private static readonly ActionDescriptor EmptyActionDescriptor = new ActionDescriptor();
         private readonly RequestDelegate _next;
+        private readonly ProblemDetailsFactory _problemDetailsFactory;
+        private readonly IActionResultExecutor<ObjectResult> _executor;
 
-        public Middleware404ProblemDetails(RequestDelegate next)
+        public Middleware404ProblemDetails(RequestDelegate next, ProblemDetailsFactory problemDetailsFactory, IActionResultExecutor<ObjectResult> executor)
         {
             _next = next;
+            _problemDetailsFactory = problemDetailsFactory;
+            _executor = executor;
         }
 
         public async Task InvokeAsync(HttpContext context)
@@ -24,13 +27,10 @@ namespace Application.Middleware
             var responseStatusCode = context.Response.StatusCode;
             if (responseStatusCode == StatusCodes.Status404NotFound && !context.Response.HasStarted)
             {
-                var factory = context.RequestServices.GetRequiredService<ProblemDetailsFactory>();
-                var pd = factory.CreateProblemDetails(context, StatusCodes.Status404NotFound, instance: context.Request.Path);
-                var executor = context.RequestServices.GetService<IActionResultExecutor<ObjectResult>>();
+                var pd = _problemDetailsFactory.CreateProblemDetails(context, StatusCodes.Status404NotFound, instance: context.Request.Path);
                 var routeData = context.GetRouteData();
-
                 var actionContext = new ActionContext(context, routeData, EmptyActionDescriptor);
-                await executor.ExecuteAsync(actionContext, new ObjectResult(pd));
+                await _executor.ExecuteAsync(actionContext, new ObjectResult(pd));
             }
         }
     }
